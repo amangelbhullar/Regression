@@ -1,78 +1,51 @@
-# Polynomial_Linear_Regression
-## Importing the libraries
+# Multi-Linear-Regression-SupervisedLearning
+
+### Importing the libraries and dataset
 
 import numpy as np
 
-import pandas as pd
-
 import matplotlib.pyplot as plt
 
-##Importing the dataset
+import pandas as pd
 
-dataset = pd.read_csv("Position_Salaries.csv")
+dataset = pd.read_csv('50_Startups.csv')
 
-x = dataset.iloc[:, 1:-1].values
+X = dataset.iloc[:, :-1].values
 
 y = dataset.iloc[:, -1].values
 
-## Training the Linear Regression model on the whole dataset
+print(X)
+
+### Encoding Categorical data
+
+from sklearn.compose import ColumnTransformer
+
+from sklearn.preprocessing import OneHotEncoder
+
+ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), [3])], remainder='passthrough')
+
+X = np.array(ct.fit_transform(X))
+
+print(x)
+
+### Splitting the dataset into the Training set and Test set
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+
+### Training the Multiple Linear Regression model on the Training set
 
 from sklearn.linear_model import LinearRegression
 
-linear_regressor = LinearRegression()
+regressor = LinearRegression()
 
-linear_regressor.fit(x, y)
+regressor.fit(X_train, y_train)
 
-LinearRegression(copy_X=True, fit_intercept=True, n_jobs=None, normalize=False)
+### Predictions
 
-## Training the Polynomial Regression model on the whole dataset
+y_pred = regressor.predict(X_test)
 
-from sklearn.preprocessing import PolynomialFeatures
+np.set_printoptions(precision=2)
 
-poly_r = PolynomialFeatures(degree = 4)
-
-x_poly = poly_r.fit_transform(x)
-
-lin_reg2 = LinearRegression()
-
-lin_reg2.fit(x_poly, y)
-
-LinearRegression(copy_X=True, fit_intercept=True, n_jobs=None, normalize=False)
-
-## Visualising the Linear Regression results
-
-plt.scatter(x, y, color = "red")
-
-plt.plot(x, linear_regressor.predict(x), color = "blue")
-
-plt.title('position level vs salary')
-
-plt.xlabel('position level')
-
-plt.ylabel('salary')
-
-plt.show()
-
-## Visualising the Polynomial Regression results
-
-plt.scatter(x, y, color = "red")
-
-plt.plot(x, lin_reg2.predict(x_poly), color = "blue")
-
-plt.title('position level vs salary')
-
-plt.xlabel('position level')
-
-plt.ylabel('salary')
-
-plt.show()
-
-## Predicting a new result with Linear Regression
-
-linear_regressor.predict([[6.5]])
-
-
-## Predicting a new result with Polynomial Regression
-
-
-lin_reg2.predict(poly_r.fit_transform([[6.5]]))
+print(np.concatenate((y_pred.reshape(len(y_pred),1), y_test.reshape(len(y_test),1)),1))
